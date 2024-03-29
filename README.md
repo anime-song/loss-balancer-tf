@@ -1,13 +1,15 @@
 # loss-balancer-tf
-Encodecのlossbalancerのtensorflowでの実装です。
 
+Encodec の lossbalancer の tensorflow での実装です。
 
 # Installation
+
 ```sh
 pip install loss-balancer-tf
 ```
 
 # Usage
+
 ```py
 class Trainer():
     def __init__(self,
@@ -45,6 +47,7 @@ class Trainer():
                 "gen": g_loss
             },
             tape=gen_tape,
+            output=g_fake,
             trainable_variables=self.generator.trainable_variables)
         self.generator_optimizer.apply_gradients(zip(scaled_gen_grads, self.generator.trainable_variables))
 
