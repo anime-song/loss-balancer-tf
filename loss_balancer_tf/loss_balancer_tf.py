@@ -31,7 +31,12 @@ class LossBalancer():
         return {key: self.total[self.keys_to_indices[key]] / self.fix[self.keys_to_indices[key]]
                     for key in metrics.keys()}
 
-    def gradient(self, loss_dict: tp.Dict[str, tf.Tensor], tape: tf.GradientTape, output: tf.Tensor, trainable_variables):
+    def gradient(
+            self,
+            loss_dict: tp.Dict[str, tf.Tensor],
+            tape: tf.GradientTape,
+            output: tf.Tensor, trainable_variables,
+            amp_dynamic_scale: float = 1.0):
         total_weights = sum(list(self.loss_weights.values()))
         ratios = {k: w / total_weights for k, w in self.loss_weights.items()}
 
@@ -71,7 +76,9 @@ class LossBalancer():
             else:
                 out_grad = out_grad + scaled_grad
 
+        out_grad = tf.multiply(out_grad, amp_dynamic_scale)
         out_grad = tape.gradient(output, trainable_variables, output_gradients=out_grad)
+        out_grad = [tf.multiply(grad, 1.0 / amp_dynamic_scale) if grad is not None else grad for grad in out_grad]
         return out_grad, metrics
 
 

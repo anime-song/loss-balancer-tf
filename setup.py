@@ -7,7 +7,7 @@ setup(
     author="anime-song",
     description="Implementation of Encodec loss balancer in tensorflow",
     license="MIT license",
-    version="0.0.3",
+    version="0.0.4",
     install_requires=["tensorflow"],
     packages=["loss_balancer_tf"]
 )
