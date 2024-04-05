@@ -23,6 +23,8 @@ class LossBalancer():
 
     def _update(self, metrics: tp.Dict[str, tp.Any], weight: float = 1) -> tp.Dict[str, float]:
         for key, value in metrics.items():
+            if tf.reduce_any(tf.math.is_nan(value)):
+                continue
             idx = self.keys_to_indices[key]
             self.total[idx].assign(self.total[idx] * self.ema_decay + weight * value)
             self.fix[idx].assign(self.fix[idx] * self.ema_decay + weight)
