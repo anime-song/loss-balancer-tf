@@ -46,11 +46,14 @@ class LossBalancer():
             gradients = tape.gradient(loss, output)
 
             if self.per_batch_item:
-                axis = tuple(range(1, len(gradients.shape)))
                 if len(gradients.shape) == 1:
-                    axis = None
-
-                norms[name] = tf.reduce_mean(tf.norm(gradients, axis=axis))
+                    norm_value = tf.norm(gradients)  # 1D vector case
+                else:
+                    # Flatten all dimensions except the batch dimension
+                    batch_size = tf.shape(gradients)[0]
+                    reshaped_gradients = tf.reshape(gradients, (batch_size, -1))
+                    norm_value = tf.reduce_mean(tf.norm(reshaped_gradients, axis=1))
+                norms[name] = norm_value
             else:
                 norms[name] = tf.norm(gradients)
 
